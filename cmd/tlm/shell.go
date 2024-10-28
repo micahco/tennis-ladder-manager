@@ -5,9 +5,9 @@ func (app *application) promptConfirm(message string, defaultYes bool) bool {
 	if defaultYes {
 		options = "Y/n"
 	}
-	app.sh.Printf("%s [%s] ", message, options)
+	app.shell.Printf("%s [%s] ", message, options)
 
-	ans := app.sh.ReadLine()
+	ans := app.shell.ReadLine()
 	switch ans {
 	case "":
 		return defaultYes
