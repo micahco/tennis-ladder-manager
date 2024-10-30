@@ -48,20 +48,6 @@ func main() {
 	}
 }
 
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = db.Exec(InitTables)
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
-}
-
 func (app *application) run(args []string) error {
 	leagues, err := app.getAllLeagues()
 	if err != nil {
@@ -123,19 +109,18 @@ func (app *application) registerCmds() {
 		Func: run(app.selectLeague),
 	})
 	app.shell.AddCmd(&ishell.Cmd{
-		Name: "go",
-		Func: func(c *ishell.Context) {
-			choice := c.MultiChoice([]string{
-				"Golangers",
-				"Go programmers",
-				"Gophers",
-				"Goers",
-			}, "What are Go programmers called ?")
-			if choice == 2 {
-				c.Println("You got it!")
-			} else {
-				c.Println("Sorry, you're wrong.")
-			}
-		},
+		Name: "player",
+		Help: "player <add,remove> <username>",
+		Func: run(app.player),
+	})
+	app.shell.AddCmd(&ishell.Cmd{
+		Name: "match",
+		Help: "match <add,remove>",
+		Func: run(app.match),
+	})
+	app.shell.AddCmd(&ishell.Cmd{
+		Name: "ladder",
+		Help: "ladder <n>",
+		Func: run(app.ladder),
 	})
 }
