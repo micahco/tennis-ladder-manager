@@ -74,7 +74,7 @@ ORDER BY
 		if err := rows.Scan(&name, &won); err != nil {
 			return err
 		}
-		app.shell.Printf("%d. %s\t%d\n", i, name, won)
+		app.shell.Printf("%d. %s\t%d\n", i, strings.ToLower(name), won)
 		i++
 	}
 

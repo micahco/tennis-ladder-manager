@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 type Player struct {
 	ID   int64
 	Name string
@@ -8,7 +10,7 @@ type Player struct {
 func (app *application) playerExists(username string, leagueID int64) (bool, error) {
 	var exists bool
 	query := "SELECT EXISTS(SELECT 1 FROM Players WHERE name = ? AND league_id = ?)"
-	err := app.db.QueryRow(query, username, leagueID).Scan(&exists)
+	err := app.db.QueryRow(query, strings.ToLower(username), leagueID).Scan(&exists)
 
 	return exists, err
 }
