@@ -1,11 +1,13 @@
 package main
 
 func (app *application) promptConfirm(message string, defaultYes bool) bool {
+	defer app.shell.Println()
+
 	options := "y/N"
 	if defaultYes {
 		options = "Y/n"
 	}
-	app.shell.Printf("%s [%s] ", message, options)
+	app.shell.Printf("\n%s [%s] ", message, options)
 
 	ans := app.shell.ReadLine()
 	switch ans {
@@ -13,7 +15,7 @@ func (app *application) promptConfirm(message string, defaultYes bool) bool {
 		return defaultYes
 	case "y", "yes":
 		return true
-	default:
-		return false
 	}
+
+	return false
 }

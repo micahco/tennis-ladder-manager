@@ -37,7 +37,7 @@ func (app *application) insertPlayer(p *Player, leagueID int64) error {
 }
 
 func (app *application) deletePlayer(name string, leagueID int64) error {
-	query := "DELETE FROM Players WHERE name = ? AND league_id ?"
+	query := "DELETE FROM Players WHERE name = ? AND league_id = ?"
 	_, err := app.db.Exec(query, name, leagueID)
 
 	return err

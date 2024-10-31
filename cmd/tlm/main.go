@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/abiosoft/ishell/v2"
+	"github.com/fatih/color"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -48,7 +50,32 @@ func main() {
 	}
 }
 
+type ByName []*ishell.Cmd
+
+func (a ByName) Len() int           { return len(a) }
+func (a ByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
 func (app *application) run(args []string) error {
+	app.registerCmds()
+	style := color.New(color.Underline, color.FgGreen).SprintFunc()
+	app.shell.Printf("\n%s - The command line tool for tennis league managers.\n", style("Tennis League Manager"))
+	app.shell.Println("\nCOMMANDS:")
+	cmds := app.shell.Cmds()
+	sort.Sort(ByName(cmds))
+	for _, cmd := range cmds {
+		if s := cmd.Help; s != "" {
+			app.shell.Printf("\t%s\t\t%s\n", cmd.Name, strings.ToUpper(string(s[0]))+s[1:])
+		}
+	}
+	app.shell.Println("\nUSAGE:")
+	for _, cmd := range cmds {
+		if cmd.LongHelp != "" {
+			app.shell.Printf("\t%s\n", cmd.LongHelp)
+		}
+	}
+	app.shell.Println()
+
 	leagues, err := app.getAllLeagues()
 	if err != nil {
 		return err
@@ -91,36 +118,40 @@ func (app *application) run(args []string) error {
 	app.league = &leagues[n]
 	app.setPrompt(app.league.Name)
 
-	app.registerCmds()
 	app.shell.Run()
 
 	return nil
 }
 
 func (app *application) setPrompt(leagueName string) {
+	style := color.New(color.Bold, color.FgGreen).SprintFunc()
 	prompt := fmt.Sprintf("(%s)> ", leagueName)
-	app.shell.SetPrompt(prompt)
+	app.shell.SetPrompt(style(prompt))
 }
 
 func (app *application) registerCmds() {
 	app.shell.AddCmd(&ishell.Cmd{
-		Name: "sl",
-		Help: "select a different league",
-		Func: run(app.selectLeague),
+		Name:     "select",
+		Help:     "choose a different league",
+		LongHelp: "select <league_name>",
+		Func:     run(app.selectLeague),
 	})
 	app.shell.AddCmd(&ishell.Cmd{
-		Name: "player",
-		Help: "player <add,remove> <username>",
-		Func: run(app.player),
+		Name:     "player",
+		Help:     "create and delete players",
+		LongHelp: "player <add,remove> <username>",
+		Func:     run(app.player),
 	})
 	app.shell.AddCmd(&ishell.Cmd{
-		Name: "match",
-		Help: "match <add,remove>",
-		Func: run(app.match),
+		Name:     "match",
+		Help:     "enter match results (or remove previous match)",
+		LongHelp: "match <add,remove>",
+		Func:     run(app.match),
 	})
 	app.shell.AddCmd(&ishell.Cmd{
-		Name: "ladder",
-		Help: "ladder <n>",
-		Func: run(app.ladder),
+		Name:     "ladder",
+		Help:     "view the current league rankings",
+		LongHelp: "ladder <number>",
+		Func:     run(app.ladder),
 	})
 }

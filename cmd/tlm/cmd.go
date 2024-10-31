@@ -50,7 +50,15 @@ LEFT JOIN
 GROUP BY 
     p.player_id
 ORDER BY 
-    matches_won DESC;`
+    matches_won DESC
+`
+
+	if len(c.Args) >= 1 {
+		n, err := strconv.Atoi(c.Args[0])
+		if err == nil && n > 0 {
+			query += fmt.Sprintf("LIMIT %d", n)
+		}
+	}
 
 	rows, err := app.db.Query(query)
 	if err != nil {
@@ -58,7 +66,7 @@ ORDER BY
 	}
 	defer rows.Close()
 
-	app.shell.Println("USERNAME\tMATCHES WON")
+	app.shell.Println("USERNAME\tWINS")
 	i := 1
 	for rows.Next() {
 		var name string
@@ -101,7 +109,7 @@ func (app *application) addPlayer(username string) error {
 	}
 
 	for p.Name == "" {
-		app.shell.Print("Player username: ")
+		app.shell.Print("\nPlayer username: ")
 		p.Name = app.shell.ReadLine()
 	}
 
@@ -111,7 +119,7 @@ func (app *application) addPlayer(username string) error {
 	}
 
 	if exists {
-		app.shell.Println("Player with username already exists.")
+		app.shell.Println("Cannot add player: username already exists")
 		return nil
 	}
 
@@ -120,7 +128,7 @@ func (app *application) addPlayer(username string) error {
 		return err
 	}
 
-	app.shell.Println("Successfully added player:", strings.ToLower(p.Name))
+	app.shell.Println("\nSuccessfully created player:", strings.ToLower(p.Name))
 
 	return nil
 }
@@ -136,7 +144,15 @@ func (app *application) removePlayer(username string) error {
 		return nil
 	}
 
-	err = app.removePlayer(username)
+	app.shell.Println("\nAre you sure you want to remove this player from the database?\nDon't worry, this won't remove the matches this player has competed in.")
+
+	cont := app.promptConfirm("Delete player?", false)
+	if !cont {
+		app.shell.Println("Aborted...")
+		return nil
+	}
+
+	err = app.deletePlayer(username, app.league.ID)
 	if err != nil {
 		return err
 	}
@@ -204,11 +220,9 @@ func (app *application) newMatch() error {
 		return err
 	}
 
-	fmt.Println(pa.Name, pb.Name)
-
 	m := Match{
 		PlayerA: pa.ID,
-		PlayerB: pa.ID,
+		PlayerB: pb.ID,
 	}
 
 	err = app.insertMatch(&m, app.league.ID)
@@ -226,14 +240,14 @@ func (app *application) newMatch() error {
 	aWins := 0
 	bWins := 0
 
-	app.shell.Printf("%s\t%s\n", pa.Name, pb.Name)
+	app.shell.Printf("\n%s\t\t%s\n", pa.Name, pb.Name)
 	for _, s := range sets {
 		if s.PlayerAGamesWon > s.PlayerBGamesWon {
 			aWins++
 		} else {
 			bWins++
 		}
-		app.shell.Printf("%d\t%d\n", s.PlayerAGamesWon, s.PlayerBGamesWon)
+		app.shell.Printf("%d\t\t%d\n", s.PlayerAGamesWon, s.PlayerBGamesWon)
 	}
 
 	var winner *Player
@@ -243,6 +257,7 @@ func (app *application) newMatch() error {
 		winner = &pb
 	}
 
+	app.shell.Println()
 	if winner != nil {
 		err = app.setMatchWinner(&m, winner.ID, app.league.ID)
 		if err != nil {
@@ -258,8 +273,8 @@ func (app *application) newMatch() error {
 
 func (app *application) enterSetResults(pa, pb *Player, matchID int64) ([]*Set, error) {
 	sets := make([]*Set, 0)
-	for i := 0; true; i++ {
-		if i == 0 {
+	for i := 1; true; i++ {
+		if i == 1 {
 			app.shell.Println("\nEnter set 1 results.")
 		} else {
 			msg := fmt.Sprintf("\nEnter set %d results?", i)
@@ -306,5 +321,27 @@ func (app *application) enterSetResults(pa, pb *Player, matchID int64) ([]*Set, 
 }
 
 func (app *application) removeMatch() error {
+	m, err := app.getLastMatch(app.league.ID)
+	if err != nil {
+		return err
+	}
+
+	app.shell.Printf("Last match:\t%s vs %s\n", strings.ToUpper(m.PlayerA), strings.ToUpper(m.PlayerB))
+
+	app.shell.Println("\nAre you sure you want to remove this match from the database?\nWARNING: Once deleted the stats of the match cannot be recovered.")
+
+	cont := app.promptConfirm("Delete match?", false)
+	if !cont {
+		app.shell.Println("Aborted...")
+		return nil
+	}
+
+	err = app.deleteMatch(m.ID, app.league.ID)
+	if err != nil {
+		return err
+	}
+
+	app.shell.Println("Successfully removed match.")
+
 	return nil
 }
