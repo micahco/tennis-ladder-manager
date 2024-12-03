@@ -1,10 +1,24 @@
 .PHONY: build
 build:
-	go build -ldflags="-s" -o=./bin/tlm ./cmd/tlm
+	GODEBUG=asyncpreemptoff=1 go build -ldflags="-s" -o=./bin/tlm ./cmd/tlm
+
+
+.PHONY: kill
+kill:
+	pkill -f python
+
+
+SERVERS = services/quote_server.py services/validator.py services/artwork.py services/statistics.py
+.PHONY: services
+services: kill
+	@echo -e "\nSTARTING MICROSERVICES:\n"
+	$(foreach server, $(SERVERS), .venv/bin/python $(server) &)
+
 
 .PHONY: run
 run:
-	go run ./cmd/tlm
+	GODEBUG=asyncpreemptoff=1 go run ./cmd/tlm	
+
 
 .PHONY: audit
 audit:

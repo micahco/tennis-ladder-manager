@@ -89,7 +89,15 @@ func (app *application) run(args []string) error {
 	app.registerCmds()
 	style := color.New(color.Underline, color.FgGreen).SprintFunc()
 	app.shell.Printf("\n%s - add players, record matches, and view rankings.\n", style("Tennis League Manager"))
-	app.shell.Println("\nCOMMANDS:")
+
+	// Inspirational quote
+	err = app.quote(nil)
+	if err != nil {
+		return err
+	}
+
+	// Usage
+	app.shell.Println("COMMANDS:")
 	cmds := app.shell.Cmds()
 	sort.Sort(ByName(cmds))
 	for _, cmd := range cmds {
@@ -146,7 +154,7 @@ func (app *application) registerCmds() {
 	app.shell.AddCmd(&ishell.Cmd{
 		Name:     "match",
 		Help:     "record match results",
-		LongHelp: "match <add,remove>",
+		LongHelp: "match",
 		Func:     run(app.match),
 	})
 	app.shell.AddCmd(&ishell.Cmd{
@@ -154,5 +162,23 @@ func (app *application) registerCmds() {
 		Help:     "view the current league rankings",
 		LongHelp: "ladder <number>",
 		Func:     run(app.ladder),
+	})
+	app.shell.AddCmd(&ishell.Cmd{
+		Name:     "quote",
+		Help:     "print inspirational quote",
+		LongHelp: "quote",
+		Func:     run(app.quote),
+	})
+	app.shell.AddCmd(&ishell.Cmd{
+		Name:     "artwork",
+		Help:     "print ascii picture",
+		LongHelp: "artwork <color>",
+		Func:     run(app.artwork),
+	})
+	app.shell.AddCmd(&ishell.Cmd{
+		Name:     "stats",
+		Help:     "view player statistics",
+		LongHelp: "stats <username>",
+		Func:     run(app.stats),
 	})
 }

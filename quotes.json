@@ -1,0 +1,182 @@
+[
+    {
+        "quote": "Hard work beats talent when talent doesn't work hard.",
+        "author": "Tim Notke",
+        "sport": "Basketball",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "You miss 100% of the shots you don't take.",
+        "author": "Wayne Gretzky",
+        "sport": "Hockey",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "Champions keep playing until they get it right.",
+        "author": "Billie Jean King",
+        "sport": "Tennis",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "The best motivation always comes from within.",
+        "author": "Michael Johnson",
+        "sport": "Track and Field",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "Champions aren't made in the gyms. Champions are made from something they have deep inside them -- a desire, a dream, a vision.",
+        "author": "Muhammad Ali",
+        "sport": "Boxing",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "To succeed…You need to find something to hold on to, something to motivate you, something to inspire you.",
+        "author": "Tony Dorsett",
+        "sport": "Football",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "Experience is a hard teacher because she gives the test first, the lesson afterward.",
+        "author": "Vernon Law",
+        "sport": "Baseball",
+        "mood": "Overcoming Failure"
+    },
+    {
+        "quote": "If you can't accept losing, you can't win.",
+        "author": "Vince Lombardi",
+        "sport": "Football",
+        "mood": "Overcoming Failure"
+    },
+    {
+        "quote": "Difficulties in life are intended to make us better, not bitter.",
+        "author": "Dan Reeves",
+        "sport": "Football",
+        "mood": "Overcoming Failure"
+    },
+    {
+        "quote": "You can make mistakes, but you're not a failure until you start blaming others for those mistakes.",
+        "author": "John Wooden",
+        "sport": "Basketball",
+        "mood": "Overcoming Failure"
+    },
+    {
+        "quote": "Persistence can change failure into extraordinary achievement.",
+        "author": "Matt Biondi",
+        "sport": "Swimming",
+        "mood": "Overcoming Failure"
+    },
+    {
+        "quote": "We can't win at home. We can't win on the road. As general manager, I just can't figure out where else to play.",
+        "author": "Pat Williams",
+        "sport": "Basketball",
+        "mood": "Funny"
+    },
+    {
+        "quote": "I'm a light eater. As soon as it's light, I start eating.",
+        "author": "Art Donovan",
+        "sport": "Football",
+        "mood": "Funny"
+    },
+    {
+        "quote": "You can sum up this sport in two words: You never know.",
+        "author": "Lou Duva",
+        "sport": "Boxing",
+        "mood": "Funny"
+    },
+    {
+        "quote": "We didn't tackle well today but we made up for it by not blocking.",
+        "author": "John McKay",
+        "sport": "Football",
+        "mood": "Funny"
+    },
+    {
+        "quote": "It's only game. Why you have to be mad?",
+        "author": "Ilya Bryzgalov",
+        "sport": "Hockey",
+        "mood": "Funny"
+    },
+    {
+        "quote": "Never let the fear of striking out get in your way.",
+        "author": "Babe Ruth",
+        "sport": "Baseball",
+        "mood": "Dealing with Anxiety"
+    },
+    {
+        "quote": "Relax? How can anybody relax and play golf? You have to grip the club, don't you?",
+        "author": "Ben Hogan",
+        "sport": "Golf",
+        "mood": "Dealing with Anxiety"
+    },
+    {
+        "quote": "Concentration is a fine antidote to anxiety.",
+        "author": "Jack Nicklaus",
+        "sport": "Golf",
+        "mood": "Dealing with Anxiety"
+    },
+    {
+        "quote": "Pressure is something you feel when you don't know what you're doing.",
+        "author": "Peyton Manning",
+        "sport": "Football",
+        "mood": "Dealing with Anxiety"
+    },
+    {
+        "quote": "Effective teamwork begins and ends with communication.",
+        "author": "Mike Krzyzewski",
+        "sport": "Basketball",
+        "mood": "Teamwork"
+    },
+    {
+        "quote": "A hockey team is like a puzzle. Every piece is vital.",
+        "author": "Bob Hartley",
+        "sport": "Hockey",
+        "mood": "Teamwork"
+    },
+    {
+        "quote": "The secret of winning football games is working more as a team, less as individuals. I play not my 11 best, but my best 11.",
+        "author": "Knute Rockne",
+        "sport": "Football",
+        "mood": "Teamwork"
+    },
+    {
+        "quote": "The strength of the team is each individual member. The strength of each member is the team.",
+        "author": "Phil Jackson",
+        "sport": "Basketball",
+        "mood": "Teamwork"
+    },
+    {
+        "quote": "You cannot be serious!",
+        "author": "John McEnroe",
+        "sport": "Tennis",
+        "mood": "Funny"
+    },
+    {
+        "quote": "Start where you are. Use what you have. Do what you can.",
+        "author": "Arthur Ashe",
+        "sport": "Tennis",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "Pressure is a privilege - it only comes to those who earn it.",
+        "author": "Patrick Rifter",
+        "sport": "Tennis",
+        "mood": "Dealing with Anxiety"
+    },
+    {
+        "quote": "I'd rather have the attitude of a champion than the trophy of a loser.",
+        "author": "Kim Clijsters",
+        "sport": "Tennis",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "The only victory that counts is the one over yourself.",
+        "author": "Lionel Messi",
+        "sport": "Soccer",
+        "mood": "Motivational"
+    },
+    {
+        "quote": "I am a member of a team, and I rely on the team, I defer to it and sacrifice for it, because the team, not the individual, is the ultimate champion.",
+        "author": "Mia Hamm",
+        "sport": "Soccer",
+        "mood": "Teamwork"
+    }
+]

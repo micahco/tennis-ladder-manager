@@ -1,12 +1,15 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/abiosoft/ishell/v2"
+	"github.com/pebbe/zmq4"
 )
 
 type cmdFunc func(c *ishell.Context)
@@ -128,7 +131,7 @@ func (app *application) addPlayer(username string) error {
 		return err
 	}
 
-	app.shell.Println("\nSuccessfully created player:", strings.ToLower(p.Name))
+	app.shell.Println("Successfully created player:", strings.ToLower(p.Name))
 
 	return nil
 }
@@ -284,27 +287,38 @@ func (app *application) enterSetResults(pa, pb *Player, matchID int64) ([]*Set, 
 			}
 		}
 
+		var err error
 		s := Set{
 			MatchID:         matchID,
 			SetNumber:       i,
 			PlayerAGamesWon: -1,
 			PlayerBGamesWon: -1,
 		}
-
-		var err error
-		for s.PlayerAGamesWon == -1 {
-			app.shell.Printf("%s games won: ", pa.Name)
-			in := app.shell.ReadLine()
-			s.PlayerAGamesWon, err = strconv.Atoi(in)
-			if err != nil {
-				s.PlayerAGamesWon = -1
+		validated := false
+		for !validated {
+			for s.PlayerAGamesWon < 0 {
+				app.shell.Printf("%s games won: ", pa.Name)
+				in := app.shell.ReadLine()
+				s.PlayerAGamesWon, err = strconv.Atoi(in)
+				if err != nil {
+					s.PlayerAGamesWon = -1
+				}
 			}
-		}
-		for s.PlayerBGamesWon == -1 {
-			app.shell.Printf("%s games won: ", pb.Name)
-			in := app.shell.ReadLine()
-			s.PlayerBGamesWon, err = strconv.Atoi(in)
+			for s.PlayerBGamesWon < 0 {
+				app.shell.Printf("%s games won: ", pb.Name)
+				in := app.shell.ReadLine()
+				s.PlayerBGamesWon, err = strconv.Atoi(in)
+				if err != nil {
+					s.PlayerBGamesWon = -1
+				}
+			}
+			validated, err = app.validate_set(s.PlayerAGamesWon, s.PlayerBGamesWon)
 			if err != nil {
+				return nil, err
+			}
+			if !validated {
+				app.shell.Println("\nInvlaid set games. Please enter a valid set.")
+				s.PlayerAGamesWon = -1
 				s.PlayerBGamesWon = -1
 			}
 		}
@@ -342,6 +356,136 @@ func (app *application) removeMatch() error {
 	}
 
 	app.shell.Println("Successfully removed match.")
+
+	return nil
+}
+
+func (app *application) artwork(c *ishell.Context) error {
+	color := ""
+	if len(c.Args) == 1 {
+		color = c.Args[0]
+	}
+
+	context, err := zmq4.NewContext()
+	if err != nil {
+		return err
+	}
+	defer context.Term()
+
+	socket, err := context.NewSocket(zmq4.REQ)
+	if err != nil {
+		return err
+	}
+	defer socket.Close()
+	err = socket.Connect("tcp://localhost:9875")
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(color)
+	if err != nil {
+		return err
+	}
+	// Send the request to the server
+	_, err = socket.SendBytes(b, 0)
+	if err != nil {
+		return err
+	}
+	// Wait for a response
+	res, err := socket.Recv(0)
+	if err != nil {
+		return err
+	}
+
+	app.shell.Println(res)
+
+	return nil
+}
+
+func (app *application) stats(c *ishell.Context) error {
+	if len(c.Args) != 1 {
+		return errors.New("missing username")
+	}
+
+	query := `SELECT
+    COALESCE(wins.count, 0) AS wins,
+    COALESCE(losses.count, 0) AS losses
+FROM 
+    Players p
+LEFT JOIN (
+    SELECT 
+        winner_id AS player_id, 
+        COUNT(*) AS count
+    FROM 
+        Matches
+    WHERE 
+        winner_id IS NOT NULL
+    GROUP BY 
+        winner_id
+) AS wins
+ON 
+    p.player_id = wins.player_id
+LEFT JOIN (
+    SELECT 
+        CASE 
+            WHEN a_player_id = winner_id THEN b_player_id
+            WHEN b_player_id = winner_id THEN a_player_id
+        END AS player_id,
+        COUNT(*) AS count
+    FROM 
+        Matches
+    WHERE 
+        winner_id IS NOT NULL
+    GROUP BY 
+        player_id
+) AS losses
+ON 
+    p.player_id = losses.player_id
+WHERE 
+    p.league_id = ?
+    AND LOWER(p.name) = LOWER(?);`
+
+	username := c.Args[0]
+	var wins, losses int
+	err := app.db.QueryRow(query, app.league.ID, username).Scan(&wins, &losses)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("player with username does not exist")
+		}
+		return err
+	}
+
+	context, err := zmq4.NewContext()
+	if err != nil {
+		return err
+	}
+	defer context.Term()
+
+	socket, err := context.NewSocket(zmq4.REQ)
+	if err != nil {
+		return err
+	}
+	defer socket.Close()
+	err = socket.Connect("tcp://localhost:9877")
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal([]int{wins, losses})
+	if err != nil {
+		return err
+	}
+	// Send the request to the server
+	_, err = socket.SendBytes(b, 0)
+	if err != nil {
+		return err
+	}
+
+	// Wait for a response
+	res, err := socket.Recv(0)
+	if err != nil {
+		return err
+	}
+
+	app.shell.Println(res)
 
 	return nil
 }
